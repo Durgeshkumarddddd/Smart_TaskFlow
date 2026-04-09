@@ -1,0 +1,161 @@
+<nav class="navbar navbar-expand-lg shadow py-2 tf-navbar">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" routerLink="/" (click)="closeMenu()" style="font-size:1.3rem;">
+      <img src="/assets/WebLogo.png" alt="TaskFlow" style="width:38px;height:40px;border-radius:15px;">
+      <span>TaskFlow</span>
+    </a>
+
+    <div class="d-flex align-items-center gap-2 ms-auto order-lg-2">
+      <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center tf-dark-toggle"
+              (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
+        <i [class]="isDarkMode ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars-fill'" 
+           [style.color]="isDarkMode ? '' : 'var(--tf-nav-text)'"
+           style="font-size:0.95rem;"></i>
+      </button>
+
+      <ng-container *ngIf="!isLoggedIn">
+        <a class="nav-link d-none d-lg-inline-block px-2" routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Login</a>
+        <a class="btn btn-sm px-3 py-1 fw-semibold d-none d-lg-inline-block"
+           style="background:linear-gradient(135deg,#3B82F6,#8B5CF6);color:#fff;border:none;border-radius:20px;"
+           routerLink="/register" (click)="closeMenu()">Register</a>
+      </ng-container>
+
+      <ng-container *ngIf="isLoggedIn">
+
+        <!-- Notification Bell -->
+        <div class="position-relative me-3">
+          <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center tf-notification-btn"
+                  [class.active]="isNotificationsOpen"
+                  (click)="toggleNotifications()" type="button">
+            <i class="bi bi-bell-fill" style="font-size:1.1rem; color: #cbd5e1;"></i>
+            <span *ngIf="unreadCount > 0" 
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-slate-900"
+                  style="font-size: 0.6rem; padding: 0.25em 0.5em; margin-top: 5px; margin-left: -5px;">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
+          </button>
+
+          <!-- Notification Dropdown -->
+          <div class="position-absolute end-0 mt-2 rounded-3 shadow-lg tf-dropdown overflow-hidden"
+               *ngIf="isNotificationsOpen" style="width:320px; z-index:1060; border: 1px solid var(--tf-border);">
+            <div class="px-3 py-3 border-bottom d-flex justify-content-between align-items-center" 
+                 style="background: rgba(255,255,255,0.03); border-color:var(--tf-border)!important;">
+              <div class="fw-black text-uppercase tracking-wider" style="color:var(--tf-text); font-size: 0.75rem;">Notifications</div>
+              <button class="btn btn-link btn-sm text-decoration-none p-0" 
+                      style="font-size: 0.7rem; color: var(--tf-accent);" 
+                      (click)="clearAllNotifications()">Clear All</button>
+            </div>
+            
+            <div class="notification-list" style="max-height: 350px; overflow-y: auto;">
+              <div *ngIf="notifications.length === 0" class="px-4 py-5 text-center opacity-50">
+                <i class="bi bi-bell-slash text-2xl mb-2 d-block"></i>
+                <div class="small fw-bold uppercase tracking-widest">No new alerts</div>
+              </div>
+
+              <div *ngFor="let note of notifications" 
+                   class="notification-item px-3 py-3 border-bottom transition-all cursor-pointer hover-bg-light-dark"
+                   [class.unread]="!note.isRead"
+                   (click)="markAsRead(note.id, $event)"
+                   style="border-color:var(--tf-border)!important;">
+                <div class="d-flex gap-3">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg d-flex align-items-center justify-content-center"
+                         [ngClass]="{
+                           'bg-blue-500/10 text-blue-500': note.type === 'info',
+                           'bg-green-500/10 text-green-500': note.type === 'success',
+                           'bg-warning-500/10 text-warning': note.type === 'warning',
+                           'bg-danger-500/10 text-danger': note.type === 'error'
+                         }">
+                      <i class="bi" [ngClass]="{
+                        'bi-info-circle': note.type === 'info',
+                        'bi-check-circle': note.type === 'success',
+                        'bi-exclamation-triangle': note.type === 'warning',
+                        'bi-x-circle': note.type === 'error'
+                      }"></i>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                      <div class="fw-bold small" style="color:var(--tf-text); line-height: 1.2;">{{ note.title }}</div>
+                      <div class="unread-dot w-2 h-2 rounded-full bg-blue-500" *ngIf="!note.isRead"></div>
+                    </div>
+                    <div class="text-muted small" style="font-size: 0.75rem; line-height: 1.3;">{{ note.message }}</div>
+                    <div class="text-muted mt-2" style="font-size: 0.65rem;">{{ note.timestamp | date:'shortTime' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="px-3 py-2 text-center bg-light-dark">
+              <button class="btn btn-link btn-sm text-decoration-none font-bold uppercase tracking-tighter"
+                      style="font-size: 0.65rem; color: var(--tf-text-muted);"
+                      (click)="isNotificationsOpen = false">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="position-relative">
+          <button class="btn btn-sm d-flex align-items-center gap-2 px-2 py-1 rounded-pill"
+                  style="background:rgba(var(--tf-nav-text-rgb), 0.05); border:1px solid rgba(var(--tf-nav-text-rgb), 0.1); color:var(--tf-nav-text);"
+                  (click)="toggleUserDropdown()" type="button">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold"
+                  style="width:30px;height:30px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);font-size:0.8rem;color:white;">
+              {{ (currentUser?.username || 'U').charAt(0).toUpperCase() }}
+            </span>
+            <span class="fw-semibold d-none d-sm-inline small">{{ currentUser?.username || 'User' }}</span>
+            <i class="bi bi-chevron-down" style="font-size:0.7rem;"></i>
+          </button>
+
+          <div class="position-absolute end-0 mt-2 rounded-3 shadow-lg py-1 tf-dropdown"
+               *ngIf="isUserDropdownOpen" style="min-width:200px;z-index:1060;">
+            <div class="px-3 py-2 border-bottom" style="border-color:var(--tf-border)!important;">
+              <div class="fw-bold small" style="color:var(--tf-text);">{{ currentUser?.username || 'User' }}</div>
+              <div style="font-size:0.75rem;color:var(--tf-text-muted);">{{ currentUser?.email || '' }}</div>
+            </div>
+            <a class="dropdown-item d-flex align-items-center gap-2 px-3 py-2 small tf-dropdown-item"
+               routerLink="/dashboard" (click)="closeDropdowns()">
+              <i class="bi bi-grid-1x2"></i> Dashboard
+            </a>
+            <hr class="my-1" style="border-color:var(--tf-border);">
+            <button class="dropdown-item d-flex align-items-center gap-2 px-3 py-2 small text-danger tf-dropdown-item"
+                    (click)="logout(); closeDropdowns(); closeMenu()">
+              <i class="bi bi-box-arrow-right"></i> Sign Out
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <button class="navbar-toggler border-0 d-lg-none ms-1" type="button"
+              (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+
+    <div class="navbar-collapse order-lg-1" [class.show]="isMenuOpen">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/teams" routerLinkActive="active" (click)="closeMenu()">Teams</a>
+        </li>
+        <li class="nav-item" *appHasRole="['ADMIN']">
+          <a class="nav-link" routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">Admin</a>
+        </li>
+        <li class="nav-item" *ngIf="isLoggedIn">
+          <a class="nav-link" routerLink="/settings" routerLinkActive="active" (click)="closeMenu()">Settings</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav d-lg-none mb-2" *ngIf="!isLoggedIn">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/register" routerLinkActive="active" (click)="closeMenu()">Register</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div *ngIf="isUserDropdownOpen" class="position-fixed top-0 start-0 w-100 h-100" style="z-index:1050;" (click)="closeDropdowns()"></div>
+</nav>

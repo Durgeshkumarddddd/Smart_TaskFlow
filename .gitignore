@@ -1,0 +1,97 @@
+# ====================
+# Node / Angular
+# ====================
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.sass-cache/
+frontend/.vscode/
+
+# ====================
+# Java / Maven
+# ====================
+backend/target/
+backend/.mvn/
+backend/*.jar
+backend/*.war
+
+# ====================
+# IDE
+# ====================
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.continue/
+
+# ====================
+# OS
+# ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ====================
+# Environment
+# ====================
+*.env
+*.env.local
+
+# ====================
+# Logs
+# ====================
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# ====================
+# Coverage
+# ====================
+frontend/coverage/
+backend/jacoco/
+
+# ====================
+# Binary / Reference Files
+# ====================
+*.pdf
+UI1/
+UI2/
+UI3/
+
+# ====================
+# Extra docs (not for GitHub)
+# ====================
+TESTING_GUIDE.md
+GUIDE.md
+plan.md
+plan2.md
+frontend/README.md
+backend/GUIDE.md
+DOCKER.md
+backend/docker-compose.yml
+.vercel
+.env*.local
+application-secrets.properties
+
+# ====================
+# Temporary & Generated files
+# ====================
+plan*.md
+*build_errors*.txt
+*compile_errors*.txt
+*ts_errors*.txt
+test_output.txt
+tmp-playwright-check.js
+frontend_test_final.log
+
+# ====================
+# User Ignored Output Files
+# ====================
+project_report.md
+log8.txt
+log
+backend/tree.txt
+gitlog.txt
+test-upload*.txt

@@ -1,0 +1,170 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
+  <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Admin System Control</h1>
+      <p class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-[0.2em] mt-1">Full infrastructure and user management</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+        Restricted Access
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Statistics Grid -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-sm transition-transform hover:scale-[1.02]">
+      <p class="text-[10px] font-black text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Global Users</p>
+      <div class="text-3xl font-black text-slate-900 dark:text-white">{{ users.length }}</div>
+    </div>
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-sm transition-transform hover:scale-[1.02]">
+      <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Admins</p>
+      <div class="text-3xl font-black text-blue-600 dark:text-blue-400">{{ totalAdmins }}</div>
+    </div>
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-sm transition-transform hover:scale-[1.02]">
+      <p class="text-[9px] font-bold text-green-700/70 dark:text-green-400/60 uppercase tracking-widest mb-1.5">My Teams</p>
+      <div class="text-3xl font-black text-purple-600 dark:text-purple-400">{{ totalManagers }}</div>
+    </div>
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-sm transition-transform hover:scale-[1.02]">
+      <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Suspended</p>
+      <div class="text-3xl font-black text-red-600 dark:text-red-400">{{ totalInactive }}</div>
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl p-3 mb-8 shadow-sm">
+    <div class="flex flex-col lg:flex-row items-center gap-4">
+      <div class="relative w-full lg:w-72">
+        <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border-none rounded-xl text-xs font-bold outline-none ring-2 ring-transparent focus:ring-blue-500/10 transition-all font-bold" 
+               placeholder="Search registry..." [(ngModel)]="searchTerm">
+      </div>
+      
+      <div class="w-full overflow-x-auto scrollbar-hide">
+        <div class="flex items-center gap-1 min-w-max p-1 bg-slate-100 dark:bg-white/5 rounded-xl">
+          <button *ngFor="let role of ['ALL', 'ADMIN', 'MANAGER', 'MEMBER', 'VIEWER', 'INACTIVE']"
+                  (click)="setFilterRole(role)"
+                  [class]="selectedRole === role ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                  class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">
+            {{ role === 'ALL' ? 'Registry' : role }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Registry: Desktop Table -->
+  <div class="hidden md:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-slate-50 dark:bg-white/5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+        <tr>
+          <th class="px-6 py-4">Identity</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4">System Role</th>
+          <th class="px-6 py-4">Affiliations</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+        <tr *ngFor="let user of filteredUsers" class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-[11px] font-black text-white shadow-lg shadow-blue-500/20">
+                {{ getInitials(user.username) }}
+              </div>
+              <div>
+                <p class="text-xs font-black text-slate-800 dark:text-white">{{ user.username }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ user.email }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span [class]="user.isActive ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'" 
+                  class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-current/20">
+              {{ user.isActive ? 'Active' : 'Offline' }}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="relative inline-block group/role">
+              <button class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                {{ user.role }} <i class="bi bi-chevron-down opacity-50"></i>
+              </button>
+              <div class="absolute left-0 mt-2 w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/role:opacity-100 group-hover/role:visible transition-all z-20 overflow-hidden">
+                <button *ngFor="let r of ['ADMIN', 'MANAGER', 'MEMBER', 'VIEWER']" 
+                        (click)="onRoleChange(user, r)"
+                        class="w-full px-4 py-2 text-[9px] font-black uppercase text-left hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  {{ r }}
+                </button>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[200px]" [title]="user.teamNames?.join(', ') || 'Independent'">
+              {{ user.teamNames?.join(', ') || 'Standalone' }}
+            </p>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button (click)="toggleActive(user)" class="p-2 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-amber-100 text-amber-600 transition-colors" title="Toggle Access">
+                <i [class]="user.isActive ? 'bi bi-shield-lock' : 'bi bi-shield-check'"></i>
+              </button>
+              <button (click)="editUser(user)" class="p-2 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-blue-100 text-blue-600 transition-colors">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button (click)="deleteUser(user)" class="p-2 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-red-100 text-red-600 transition-colors">
+                <i class="bi bi-trash3-fill"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- User Registry: Mobile Cards -->
+  <div class="md:hidden space-y-4">
+    <div *ngFor="let user of filteredUsers" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-5 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-xs font-black text-white shadow-lg shadow-blue-500/20">
+            {{ getInitials(user.username) }}
+          </div>
+          <div>
+            <h4 class="text-sm font-black text-slate-800 dark:text-white">{{ user.username }}</h4>
+            <p class="text-[10px] font-bold text-slate-400 uppercase">{{ user.email }}</p>
+          </div>
+        </div>
+        <span [class]="user.isActive ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'" 
+              class="px-2 py-0.5 rounded-md text-[8px] font-black uppercase border border-current/20">
+          {{ user.isActive ? 'Active' : 'Offline' }}
+        </span>
+      </div>
+
+      <div class="flex items-center justify-between py-3 border-y border-slate-50 dark:border-white/5">
+        <div>
+          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Global Role</p>
+          <p class="text-xs font-black text-blue-600">{{ user.role }}</p>
+        </div>
+        <div>
+          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Affiliations</p>
+          <p class="text-[10px] font-bold text-slate-700 dark:text-slate-300 text-right">{{ user.teamNames?.length || 0 }} Teams</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button (click)="toggleActive(user)" class="py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase tracking-widest">
+          {{ user.isActive ? 'Deactivate' : 'Activate' }}
+        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button (click)="editUser(user)" class="py-2.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 text-[10px] font-black uppercase tracking-widest">
+            Edit
+          </button>
+          <button (click)="deleteUser(user)" class="py-2.5 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 text-[10px] font-black uppercase tracking-widest">
+            Del
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

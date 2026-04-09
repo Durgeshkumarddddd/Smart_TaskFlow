@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: taskflow-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+      - key: DATABASE_USERNAME
+      - key: DATABASE_PASSWORD
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://taskflow-XXXX.vercel.app
+      - key: DDL_AUTO
+        value: update
+      - key: LOG_LEVEL
+        value: INFO

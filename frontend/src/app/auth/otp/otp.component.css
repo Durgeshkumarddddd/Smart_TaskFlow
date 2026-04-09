@@ -1,0 +1,93 @@
+/* ── OTP Verification Page ───────────────────────────────── */
+.tf-otp-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 28px;
+  padding: 2.5rem 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+  margin: 2rem auto;
+}
+
+.tf-otp-icon-wrap {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+}
+
+.tf-otp-icon { font-size: 2.25rem; color: #fff; }
+
+/* ── Verification Animation ────────────────────────────── */
+.tf-verification-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.tf-verification-loader {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tf-center-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  color: white;
+  font-size: 1.5rem;
+  animation: rotate-center 4s linear infinite;
+}
+
+.tf-pulse-circle {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(59, 130, 246, 0.4);
+  border-radius: 50%;
+  animation: pulsar 2.5s ease-out infinite;
+}
+
+.delay-1 { animation-delay: 0.8s; }
+.delay-2 { animation-delay: 1.6s; }
+
+@keyframes pulsar {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes rotate-center {
+  0%, 40% { transform: rotate(0deg); }
+  50%, 90% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-pulse {
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+}
