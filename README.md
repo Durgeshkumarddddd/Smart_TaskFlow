@@ -1,4 +1,4 @@
-# TaskFlow
+# Smart TaskFlow
 
 TaskFlow app(Full-stack Web Application). Angular 17 frontend, Spring Boot 3 backend, PostgreSQL database.
 
